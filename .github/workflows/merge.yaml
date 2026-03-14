@@ -57,7 +57,7 @@ jobs:
         with:
           containerfiles: |
             Containerfile
-          build_args: |
+          build-args: |
             RTORRENT_VERSION=${{ matrix.rtorrent }}
             ALPINE_VERSION=${{ matrix.alpine }}
           image: ghcr.io/${{ env.IMAGE_NAME }}
