@@ -1,0 +1,77 @@
+name: Publish container images
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: ${{ github.repository_owner }}/rtorrent
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  attestations: write
+
+jobs:
+  build-images:
+    strategy:
+      matrix:
+        rtorrent: [0.16.7, 0.16.6]
+        alpine: [3.23]
+        include:
+          - rtorrent: 0.16.7
+            alpine: 3.23
+            is_latest: true
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Auth to GHCR
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set metadata
+        id: metadata
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=v${{ matrix.rtorrent }}-alpine${{ matrix.alpine }}
+            type=raw,value=latest,enable=${{ toJSON(matrix.is_latest || false) }}
+
+      - name: Print metadata
+        run: |
+          echo "tags: ${{ steps.metadata.outputs.tags }}"
+          echo "labels: ${{ steps.metadata.outputs.labels }}"
+
+      - name: Build container image
+        id: build
+        uses: redhat-actions/buildah-build@v2
+        with:
+          containerfiles: |
+            Containerfile
+          build_args: |
+            RTORRENT_VERSION=${{ matrix.rtorrent }}
+            ALPINE_VERSION=${{ matrix.alpine }}
+          image: ghcr.io/${{ env.IMAGE_NAME }}
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
+
+      - name: Push container image
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          tags: ${{ steps.metadata.outputs.tags }}
+
+      # - name: Generate artifact attestation
+      #   uses: actions/attest-build-provenance@v2
+      #   with:
+      #     subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      #     subject-digest: ${{ steps.push.outputs.digest }}
+      #     push-to-registry: true
