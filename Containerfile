@@ -1,11 +1,13 @@
-ARG RTORRENT_VERSION=0.16.6
+ARG RTORRENT_VERSION=0.16.7
 ARG LIBTORRENT_VERSION=${RTORRENT_VERSION}
 ARG ALPINE_VERSION=3.23
+ARG EXTRA_CONFIGURE_ARGS=""
 
 FROM alpine:${ALPINE_VERSION} AS build
 
 ARG RTORRENT_VERSION
 ARG LIBTORRENT_VERSION
+ARG EXTRA_CONFIGURE_ARGS
 
 WORKDIR /build
 
@@ -22,6 +24,7 @@ RUN apk add \
     build-base \
     bash \
     curl-dev \
+    elogind-dev \
     libtool \
     ncurses-dev
 
@@ -36,14 +39,14 @@ RUN cd rtorrent-${RTORRENT_VERSION} && \
     export CPPFLAGS="-I/build/output/usr/include" && \
     export LDFLAGS="-L/build/output/usr/lib" && \
     autoreconf -ivf && \
-    bash ./configure --prefix=/usr && \
+    bash ./configure --prefix=/usr $EXTRA_CONFIGURE_ARGS && \
     make -j $(nproc) && \
     make install DESTDIR=/build/output && \
     unset PKG_CONFIG_PATH CPPFLAGS LDFLAGS
 
 FROM alpine:${ALPINE_VERSION}
 
-RUN apk add --no-cache curl ncurses libstdc++
+RUN apk add --no-cache curl ncurses libstdc++ elogind-dev
 
 COPY --from=build /build/output/ /
 

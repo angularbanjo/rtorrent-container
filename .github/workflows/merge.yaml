@@ -23,12 +23,15 @@ jobs:
   build-images:
     strategy:
       matrix:
-        rtorrent: [0.16.8, 0.16.7]
+        rtorrent: [0.16.9, 0.16.8, 0.16.7]
         alpine: [3.23]
         include:
           - rtorrent: 0.16.7
             alpine: 3.23
             is_latest: true
+          - rtorrent: 0.16.9
+            alpine: 3.23
+            extra_configure_args: "--with-systemd"
 
     runs-on: ubuntu-latest
     steps:
@@ -60,6 +63,7 @@ jobs:
           build-args: |
             RTORRENT_VERSION=${{ matrix.rtorrent }}
             ALPINE_VERSION=${{ matrix.alpine }}
+            EXTRA_CONFIGURE_ARGS=${{ matrix.extra_configure_args || '' }}
           image: ghcr.io/${{ env.IMAGE_NAME }}
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
