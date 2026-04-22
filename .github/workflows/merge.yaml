@@ -26,12 +26,10 @@ jobs:
         rtorrent: [0.16.9, 0.16.8, 0.16.7]
         alpine: [3.23]
         include:
-          - rtorrent: 0.16.7
-            alpine: 3.23
-            is_latest: true
           - rtorrent: 0.16.9
             alpine: 3.23
             extra_configure_args: "--with-systemd"
+            is_latest: true
 
     runs-on: ubuntu-latest
     steps:
