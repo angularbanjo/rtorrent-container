@@ -5,7 +5,7 @@ to pick up base image/package updates.
 
 ## Tags
 
+- `v0.16.17-alpine3.23`
+- `v0.16.16-alpine3.23`
+- `v0.16.15-alpine3.23`
 - `v0.16.14-alpine3.23`, `latest`
-- `v0.16.13-alpine3.23`
-- `v0.16.12-alpine3.23`
-- `v0.16.11-alpine3.23`
