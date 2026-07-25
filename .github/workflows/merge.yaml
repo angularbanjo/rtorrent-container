@@ -23,7 +23,7 @@ jobs:
   build-images:
     strategy:
       matrix:
-        rtorrent: [0.16.14, 0.16.15, 0.16.16, 0.16.17]
+        rtorrent: [0.16.14, 0.16.15, 0.16.16, 0.16.17, 0.16.18]
         alpine: [3.23]
         include:
           - rtorrent: 0.16.14
