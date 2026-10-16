@@ -24,7 +24,7 @@ jobs:
     strategy:
       matrix:
         rtorrent: [0.16.20, 0.16.21, 0.16.22, 0.16.23, 0.16.24, 0.16.25]
-        alpine: [3.23]
+        alpine: [3.23, 3.24]
         include:
           - rtorrent: 0.16.25
             alpine: 3.23
